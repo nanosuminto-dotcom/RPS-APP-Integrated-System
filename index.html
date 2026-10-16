@@ -28,6 +28,16 @@
       }
     })();
   </script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  // Masukkan URL Project Supabase Anda
+  const SUPABASE_URL = 'sb_publishable_lWImJXgGONZU05TROe6V2g_OfJ6RPLQ'; // <--- (Sesuai dengan URL di browser dashboard Anda)
+  
+  // Masukkan "Publishable key" yang ada di layar Anda saat ini:
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ0dW1mbGdleWtveGp5dWtkaGlhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIwNjUxMTQsImV4cCI6MjEwNzY0MTExNH0.jX2aAnyCPdA5bzEhxUJH2_37-SlDXwLNUWiE3AgCgAE'; // <--- Salin seluruh teks key di gambar Anda
+  
+  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+</script>
   <style>
   /* ==========================================
      1. BASE & GLOBAL STYLES
@@ -3423,7 +3433,7 @@ function openApp() {
   if (typeof updateHeaderUser === 'function') {
     updateHeaderUser(session);
   }
-}
+}    
 function updateUI() { 
   const f = document.getElementById('branchFilter').value;
   const y = document.getElementById('matrixYear').value; 
