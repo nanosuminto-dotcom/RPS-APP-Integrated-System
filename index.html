@@ -3321,32 +3321,81 @@ window.onload = () => {
     }
   } 
 };
-    function doLogin() { const u = document.getElementById('user').value, p = document.getElementById('pass').value; if(!u || !p) return; google.script.run.withSuccessHandler(res => { if(res.status === "success") { session = res; localStorage.setItem('mr_v20_session', JSON.stringify(res)); openApp(); } else Swal.fire({ icon: 'error', title: 'Gagal', text: res.message }); }).loginUser(u, p); }
+    // 1. Fungsi Login yang sudah diubah langsung mengecek ke tabel 'Ref_User' Supabase
+async function doLogin() {
+  const u = document.getElementById('user').value.trim();
+  const p = document.getElementById('pass').value.trim();
+  
+  if (!u || !p) {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Peringatan',
+      text: 'Username dan Password wajib diisi!'
+    });
+    return;
+  }
+
+  try {
+    // Mengecek data langsung ke tabel 'Ref_User' di Supabase
+    const { data, error } = await supabase
+      .from('Ref_User')
+      .select('*')
+      .eq('username', u) // Kolom username di tabel Supabase
+      .eq('password', p) // Kolom password di tabel Supabase
+      .single();
+
+    if (error || !data) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Login Gagal',
+        text: 'Username atau Password salah!'
+      });
+    } else {
+      // Jika login berhasil, simpan data sesi
+      session = data;
+      localStorage.setItem('mr_v20_session', JSON.stringify(data));
+      
+      // Jalankan fungsi untuk membuka aplikasi
+      openApp();
+    }
+  } catch (err) {
+    console.error('Terjadi kesalahan koneksi:', err);
+    Swal.fire({
+      icon: 'error',
+      title: 'Error Sistem',
+      text: 'Gagal terhubung ke database Supabase.'
+    });
+  }
+}
+
+// 2. Fungsi openApp (Tampilan dan Hak Akses) tetap berjalan seperti biasa
 function openApp() {
   const loginPage = document.getElementById('loginPage');
   const mainArea = document.getElementById('mainArea');
 
-  // 1. Sembunyikan login dan munculkan area utama via style.display secara mutlak
+  // Sembunyikan login dan munculkan area utama
   if (loginPage) {
     loginPage.style.display = 'none';
     loginPage.classList.add('hidden');
   }
   if (mainArea) {
-    mainArea.style.display = 'block'; // Atau 'flex' sesuaikan layout utamanya
+    mainArea.style.display = 'block';
     mainArea.classList.remove('hidden');
   }
 
-  // 2. Logika Sidebar (Hanya tampil di Desktop)
+  // Logika Sidebar (Hanya tampil di Desktop)
   const sidebar = document.getElementById('sidebar');
-  if (window.innerWidth > 768) {
-    sidebar.classList.replace('hidden', 'flex');
-    sidebar.style.display = 'flex';
-  } else {
-    sidebar.classList.add('hidden'); 
-    sidebar.style.display = 'none';
+  if (sidebar) {
+    if (window.innerWidth > 768) {
+      sidebar.classList.replace('hidden', 'flex');
+      sidebar.style.display = 'flex';
+    } else {
+      sidebar.classList.add('hidden'); 
+      sidebar.style.display = 'none';
+    }
   }
 
-  // 3. Logika Role (Owner vs Staff)
+  // Logika Role (Owner vs Staff)
   const roleSekarang = session.role ? session.role.toUpperCase() : "";
   const isOwner = (roleSekarang === "OWNER" || session.branchId === "all");
 
@@ -3367,9 +3416,13 @@ function openApp() {
     if (mFinance) mFinance.style.display = 'none';
   }
 
-  // 4. Update Header & Tab
-  showTab(localStorage.getItem('mr_v20_tab') || 'dashboard');
-  updateHeaderUser(session);
+  // Update Header & Tab
+  if (typeof showTab === 'function') {
+    showTab(localStorage.getItem('mr_v20_tab') || 'dashboard');
+  }
+  if (typeof updateHeaderUser === 'function') {
+    updateHeaderUser(session);
+  }
 }
 function updateUI() { 
   const f = document.getElementById('branchFilter').value;
