@@ -28,16 +28,6 @@
       }
     })();
   </script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
-  // Masukkan URL Project Supabase Anda
-  const SUPABASE_URL = 'sb_publishable_lWImJXgGONZU05TROe6V2g_OfJ6RPLQ'; // <--- (Sesuai dengan URL di browser dashboard Anda)
-  
-  // Masukkan "Publishable key" yang ada di layar Anda saat ini:
-  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ0dW1mbGdleWtveGp5dWtkaGlhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIwNjUxMTQsImV4cCI6MjEwNzY0MTExNH0.jX2aAnyCPdA5bzEhxUJH2_37-SlDXwLNUWiE3AgCgAE'; // <--- Salin seluruh teks key di gambar Anda
-  
-  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-</script>
   <style>
   /* ==========================================
      1. BASE & GLOBAL STYLES
@@ -3331,81 +3321,32 @@ window.onload = () => {
     }
   } 
 };
-    // 1. Fungsi Login yang sudah diubah langsung mengecek ke tabel 'Ref_User' Supabase
-async function doLogin() {
-  const u = document.getElementById('user').value.trim();
-  const p = document.getElementById('pass').value.trim();
-  
-  if (!u || !p) {
-    Swal.fire({
-      icon: 'warning',
-      title: 'Peringatan',
-      text: 'Username dan Password wajib diisi!'
-    });
-    return;
-  }
-
-  try {
-    // Mengecek data langsung ke tabel 'Ref_User' di Supabase
-    const { data, error } = await supabase
-      .from('Ref_User')
-      .select('*')
-      .eq('username', u) // Kolom username di tabel Supabase
-      .eq('password', p) // Kolom password di tabel Supabase
-      .single();
-
-    if (error || !data) {
-      Swal.fire({
-        icon: 'error',
-        title: 'Login Gagal',
-        text: 'Username atau Password salah!'
-      });
-    } else {
-      // Jika login berhasil, simpan data sesi
-      session = data;
-      localStorage.setItem('mr_v20_session', JSON.stringify(data));
-      
-      // Jalankan fungsi untuk membuka aplikasi
-      openApp();
-    }
-  } catch (err) {
-    console.error('Terjadi kesalahan koneksi:', err);
-    Swal.fire({
-      icon: 'error',
-      title: 'Error Sistem',
-      text: 'Gagal terhubung ke database Supabase.'
-    });
-  }
-}
-
-// 2. Fungsi openApp (Tampilan dan Hak Akses) tetap berjalan seperti biasa
+    function doLogin() { const u = document.getElementById('user').value, p = document.getElementById('pass').value; if(!u || !p) return; google.script.run.withSuccessHandler(res => { if(res.status === "success") { session = res; localStorage.setItem('mr_v20_session', JSON.stringify(res)); openApp(); } else Swal.fire({ icon: 'error', title: 'Gagal', text: res.message }); }).loginUser(u, p); }
 function openApp() {
   const loginPage = document.getElementById('loginPage');
   const mainArea = document.getElementById('mainArea');
 
-  // Sembunyikan login dan munculkan area utama
+  // 1. Sembunyikan login dan munculkan area utama via style.display secara mutlak
   if (loginPage) {
     loginPage.style.display = 'none';
     loginPage.classList.add('hidden');
   }
   if (mainArea) {
-    mainArea.style.display = 'block';
+    mainArea.style.display = 'block'; // Atau 'flex' sesuaikan layout utamanya
     mainArea.classList.remove('hidden');
   }
 
-  // Logika Sidebar (Hanya tampil di Desktop)
+  // 2. Logika Sidebar (Hanya tampil di Desktop)
   const sidebar = document.getElementById('sidebar');
-  if (sidebar) {
-    if (window.innerWidth > 768) {
-      sidebar.classList.replace('hidden', 'flex');
-      sidebar.style.display = 'flex';
-    } else {
-      sidebar.classList.add('hidden'); 
-      sidebar.style.display = 'none';
-    }
+  if (window.innerWidth > 768) {
+    sidebar.classList.replace('hidden', 'flex');
+    sidebar.style.display = 'flex';
+  } else {
+    sidebar.classList.add('hidden'); 
+    sidebar.style.display = 'none';
   }
 
-  // Logika Role (Owner vs Staff)
+  // 3. Logika Role (Owner vs Staff)
   const roleSekarang = session.role ? session.role.toUpperCase() : "";
   const isOwner = (roleSekarang === "OWNER" || session.branchId === "all");
 
@@ -3426,14 +3367,10 @@ function openApp() {
     if (mFinance) mFinance.style.display = 'none';
   }
 
-  // Update Header & Tab
-  if (typeof showTab === 'function') {
-    showTab(localStorage.getItem('mr_v20_tab') || 'dashboard');
-  }
-  if (typeof updateHeaderUser === 'function') {
-    updateHeaderUser(session);
-  }
-}    
+  // 4. Update Header & Tab
+  showTab(localStorage.getItem('mr_v20_tab') || 'dashboard');
+  updateHeaderUser(session);
+}
 function updateUI() { 
   const f = document.getElementById('branchFilter').value;
   const y = document.getElementById('matrixYear').value; 
