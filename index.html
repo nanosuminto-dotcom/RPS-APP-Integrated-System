@@ -473,7 +473,7 @@
       <div class="px-2 mb-4 shrink-0 border-b border-white/5 pb-2">
         <div id="sideAppName" class="font-black text-xl italic tracking-tighter uppercase leading-tight" 
              style="background: linear-gradient(90deg, #fbbf24, #f59e0b); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
-          RPS APP
+          RPS APP Integrated System
         </div>
         <div id="sideVersion" class="text-[8px] text-gray-400 font-bold tracking-[0.2em] uppercase mt-1">
           Ver V.26.10.0
@@ -570,18 +570,21 @@
     </aside>
 
     <!-- MAIN CONTENT AREA -->
-    <main class="flex-1 h-screen overflow-y-auto p-6 bg-[#1a1d23] relative">
-      
-      <!-- HEADER DISPLAY UTAMA -->
-      <div class="mb-6 pb-4 border-b border-white/10 flex justify-between items-center">
-        <div>
-          <h1 id="headerTitle" class="text-xl md:text-2xl font-black text-cyan-400 uppercase tracking-tight">DASHBOARD UTAMA</h1>
-          <p id="pageDesc" class="text-xs text-gray-400 mt-0.5">Selamat datang di aplikasi terintegrasi RPS APP</p>
-        </div>
+    <main class="flex-1 w-full h-screen overflow-y-auto p-2 md:p-4 bg-[#1a1d23] relative">
+  
+  <!-- KONTROL WRAPPER VERTIKAL (Menjamin Title selalu di atas card menu saat di HP) -->
+  <div class="flex flex-col w-full h-auto">
+    
+    <!-- HEADER DISPLAY UTAMA -->
+    <div class="w-full mb-3 pb-1 border-b border-white/10 flex flex-col md:flex-row justify-between items-start md:items-center gap-1">
+      <div>
+        <h1 id="headerTitle" class="text-xl md:text-2xl font-black text-cyan-400 uppercase tracking-tight">DASHBOARD UTAMA</h1>
       </div>
+    </div>
 
-      <div class="p-6">
-  <div id="tab-dashboard" class="space-y-6">
+    <!-- AREA KUMPULAN TAB / CARD MENU ANDA -->
+    <div class="w-full">
+      <div id="tab-dashboard" class="w-full space-y-6">
  
     <!-- PANEL ATAS: 5 Card Utama & 3 Card Ringkasan (Fix Sejajar, Tanpa Geser) -->
     <div id="ownerPanel" class="space-y-4">
